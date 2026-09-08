@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME':'ai_employee_db',
         'USER':'root',
-        'PASSWORD':'atinos31.dev',
+        'PASSWORD': config('DB_PASSWORD'),
         'HOST':'localhost',
         'POST':'3306',
 
