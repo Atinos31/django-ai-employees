@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Local credentials
+.env
+.env.*
+!.env.example
+
+# Local databases
+*.sqlite3
+*.sqlite3-journal
+
+# User uploads and collected static files
+media/
+staticfiles/
+
+# Logs and macOS files
+*.log
+.DS_Store

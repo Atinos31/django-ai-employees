@@ -303,6 +303,96 @@ Before deployment, the application will need:
 
 The application is currently under development and is not presented as production-ready.
 
+
+## Development Cheat Sheet
+
+### Recommended VS Code Extensions
+
+Install these from the Extensions panel (`Cmd + Shift + X` on macOS):
+
+| Extension | Publisher | Purpose |
+|---|---|---|
+| Python | Microsoft | Python development support |
+| Pylance | Microsoft | Code completion, import suggestions and type checking |
+| Ruff | Astral | Python formatting and linting |
+| Django | Baptiste Darthenay | Django template highlighting and snippets |
+| GitHub Copilot | GitHub | Optional AI-assisted code suggestions |
+
+Editor extensions are optional development tools. They are installed in VS Code, not through `pip`.
+
+### Editor Setup
+
+1. Open the Command Palette with `Cmd + Shift + P`.
+2. Run `Python: Select Interpreter`.
+3. Select the project's `env/bin/python`.
+4. Open a Python file and run `Format Document With…`.
+5. Choose `Configure Default Formatter`, then select Ruff.
+6. Enable `Editor: Format On Save` in Settings.
+
+### Useful macOS Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + Shift + P` | Open Command Palette |
+| `Cmd + Shift + X` | Open Extensions |
+| `Cmd + P` | Find a file |
+| `Cmd + S` | Save the current file |
+| `Cmd + /` | Toggle a line comment |
+| `Cmd + Shift + V` | Preview a Markdown file |
+
+### Common Project Commands
+
+Run these from the directory containing `manage.py`.
+
+```bash
+# Activate the virtual environment on macOS/Linux
+source env/bin/activate
+
+# Start the development server
+python manage.py runserver
+
+# Check Django configuration
+python manage.py check
+
+# Create migrations after changing models
+python manage.py makemigrations
+
+# Apply database migrations
+python manage.py migrate
+
+# Open the configured MySQL database
+python manage.py dbshell
+
+# Create an administrator account
+python manage.py createsuperuser
+
+# Run tests
+python manage.py test
+```
+
+### Git Workflow
+
+```bash
+# Review changed files
+git status
+git diff
+
+# Stage a README update
+git add README.md
+
+# Review staged changes
+git diff --cached
+
+# Commit the documentation update
+git commit -m "docs: update development cheat sheet"
+
+# Push to the connected remote branch
+git push
+```
+
+Stage files intentionally and review changes before committing.
+Keep `.env`, passwords and API keys out of Git.
+
 ## Author
 
 Sandra — Python and Django developer building AI-powered applications.
