@@ -42,7 +42,7 @@ class RefundRequest(models.Model):
     STATUS_CHOICES = [  # noqa: RUF012
         ('pending', 'Pending'),
         ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
+        ('denied', 'Denied'),
     ]
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='refund_requests')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='refund_requests')

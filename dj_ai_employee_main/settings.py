@@ -14,8 +14,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
 from decouple import config
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +31,9 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+
 
 ALLOWED_HOSTS = []
 
@@ -64,7 +66,7 @@ ROOT_URLCONF = 'dj_ai_employee_main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [templates_dir := os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,11 +87,11 @@ WSGI_APPLICATION = 'dj_ai_employee_main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':'ai_employee_db',
-        'USER':'root',
+        'NAME':config('DB_NAME'),
+        'USER':config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST':'localhost',
-        'POST':'3306',
+        'HOST':config('DB_HOST'),
+        'PORT':config('DB_PORT'),
 
     }
 }
@@ -144,3 +146,7 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+LOGIN_REDIRECT_URL = '/orders/'  # Redirect to the orders page after login
+LOGOUT_REDIRECT_URL = '/login/'  # Redirect to the login page after logout
+LOGIN_URL = '/login/'  # URL for the login page
