@@ -10,7 +10,7 @@ message = client.messages.create(
     messages=[
         {
             "role": "user",
-            "content": "can you share public information about sebastian simon from Trier?",
+            "content": "what are some serious questions to ask when dating",
         }
     ],
 

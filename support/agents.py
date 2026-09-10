@@ -35,11 +35,6 @@ Important rules:
 """
 
 
-
-
-
-
-
 # SUPPORT TOOLS --> tool schema that ai will read and use to execute tasks. Each tool has a name, description, and parameters that the ai agent can use to perform specific actions.
 
 SUPPORT_TOOLS = [
@@ -125,8 +120,6 @@ SUPPORT_TOOLS = [
 ]
 
 
-
-
 # EXECUTE_TOOLS -- > function that takes a tool name and input parameters, and executes the corresponding tool function. This allows the AI agent to perform specific actions based on user input and the tools available.
 def execute_tool(tool_name, tool_input):
     if tool_name == "get_order_details":
@@ -137,8 +130,6 @@ def execute_tool(tool_name, tool_input):
 
     if tool_name == "check_delivery_status":
         return check_delivery_status(tool_input["tracking_number"], tool_input["carrier"])
-
-
 
 # AGENT LOOP --> while loop that continuously interacts with the user, processes their input, and executes tools as needed. The loop will continue until the user indicates they are done or the conversation is complete.
 
