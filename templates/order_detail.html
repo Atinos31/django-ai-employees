@@ -375,14 +375,36 @@
   }
 
 
-  function sendMessage(){
+  async function sendMessage(){
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
+
+    //console.log("Sending message:", message);
+
+    // dont send an empty message
     if(!message)
       return;
 
+   
     appendMessage(message, 'customer');
     input.value = '';
+
+    // send message to server -django view backend else catch the error
+    try{
+      const response = await fetch("/support/chat/{{order.id}}/",{
+        method:"POST",
+        headers:{
+          "Content-Type": "application/json",
+          "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:JSON.stringify({message:message})
+      });
+      //console.log('response===>', await response.json());
+     
+    }catch(error){
+      console.error
+
+    }
 
   }
 

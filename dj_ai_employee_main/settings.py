@@ -100,8 +100,6 @@ DATABASES = {
 # Create mysql database using CLI or mysql workbench
 
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
@@ -151,3 +149,7 @@ MAILERS = {
 LOGIN_REDIRECT_URL = '/orders/'  # Redirect to the orders page after login
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect to the login page after logout
 LOGIN_URL = '/login/'  # URL for the login page
+
+# claude api key and model
+ANTHROPIC_API_KEY = config('ANTHROPIC_API_KEY')
+ANTHROPIC_MODEL = config('ANTHROPIC_MODEL')
