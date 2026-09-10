@@ -1,5 +1,8 @@
 from django.utils import timezone
+
 from orders.models import Order, RefundRequest
+
+from .tracking_data import DELIVERY_DATA
 
 
 def get_order_details(order_id):
@@ -42,3 +45,17 @@ def get_refund_history(user_id):
         "total_refund_requests":len(history),
         "history": history
     }
+
+
+def check_delivery_status(tracking_number, carrier):
+    default_response = {
+        "status": "Unknown",
+        "last_location": "Tracking information not available",
+        "last_update": "N/A",
+        "estimated_delivery": "Contact carrier directly for more information",
+        "delay_reason": "No updates from the carrier. Please check with them for the latest status.",
+    }
+    result = DELIVERY_DATA.get(tracking_number, default_response)
+    result["tracking_number"] = tracking_number
+    result["carrier"] = carrier
+    return result
