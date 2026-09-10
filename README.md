@@ -1,514 +1,271 @@
-AI Support Agents
+# 🌪️  AI — Autonomous Customer Support System
 
-An AI-powered customer support application built with Python, Django and MySQL.
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-092E20?style=flat-square&logo=django&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![Claude API](https://img.shields.io/badge/Claude_API-D97706?style=flat-square&logo=anthropic&logoColor=white)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-000000?style=flat-square&logo=databricks&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)
 
-The application uses CoolBreeze, a fictional air-conditioning company, as its demonstration business. The application will coordinate specialised AI agents to answer customer questions, investigate orders, assess refund requests and escalate cases for further review.
+An enterprise-grade, multi-agent AI customer support platform built from first principles for **CoolBreeze AC**. 
 
-The project focuses on implementing agent loops, tool calling and multi-agent coordination directly in Python, with Django providing the application and data layer.
+Instead of relying solely on high-level frameworks like LangChain, this system implements the **agent loop, custom tool-calling, and multi-agent orchestration directly in pure Python**, backed by Django ORM models and real-time streaming interfaces.
 
-Status: Active development. Django and MySQL are configured. Product, order and refund request models are implemented, migrations have been applied, and sample data has been loaded. Agent workflows, document retrieval and the live support dashboard are planned.
+> 🛠️ **Status:** Active development. Django and MySQL are configured. Product, order, and refund request models are implemented, migrations have been applied, and sample data has been loaded. Agent workflows, document retrieval, and the live support dashboard are planned.
 
-Project Goals
+---
 
-Build customer support agents that can retrieve business information and take controlled actions.
+## 📸 Screenshots & Overview
 
-Connect AI tool calls to application data through the Django ORM.
+### AI Agent Tools Overview
 
-Coordinate support, management and risk assessment workflows.
+![AI Agent tools overview](docs/images/example_tools.png)
 
-Ground responses in company documents and policies.
+---
 
-Make agent activity visible through a live staff dashboard.
+## 🎯 Project Goals
 
-Deploy the application with environment-based configuration.
+- **Autonomous Customer Support:** Build agents capable of retrieving business information and executing controlled database actions.
+- **ORM Tool Integration:** Connect AI tool calls directly to application data through the Django ORM.
+- **Multi-Agent Orchestration:** Coordinate tier-1 support, management, and risk assessment workflows autonomously.
+- **Zero-Hallucination RAG:** Ground model responses strictly in official company documents and policies.
+- **Real-Time Visibility:** Make all agent loops and tool calls visible to staff through a live streaming dashboard.
+- **Cloud Deployment:** Deploy the application using environment-based configuration on Railway.
 
-Planned Agent Workflows
+---
 
-AURA — Customer Support Agent
+## 🤖 Multi-Agent Architecture
 
-AURA will serve as the first point of contact for customer enquiries.
+The application coordinates three specialized autonomous agents that work together to resolve complex customer inquiries, inspect database states, and evaluate refunds safely.
 
-Planned responsibilities:
+| Agent | Role | Planned Responsibilities |
+| :--- | :--- | :--- |
+| **AURA** | **L1 Customer Support** | First point of contact. Answers product, delivery, and policy questions. Retrieves order info via tools, checks delivery status, and escalates out-of-scope issues. |
+| **Manager Agent** | **Escalation & Approvals** | Reviews cases escalated by AURA. Consults policies, requests risk assessments, decides refund eligibility within defined permissions, and logs explanations. |
+| **Risk Agent** | **Fraud Assessment** | Reviews order and customer history for suspicious patterns. Returns structured risk scores to assist the Manager Agent (does not constitute proof of fraud). |
 
-Answer product, delivery and policy questions.
+---
 
-Retrieve order information through dedicated tools.
+## ⚡ Core AI Infrastructure
 
-Check delivery status.
+### 📚 Document Retrieval (RAG)
+A Retrieval-Augmented Generation pipeline provides agents with grounded context from official documents (e.g., refund policies, delivery procedures, product manuals):
+- Extract text from PDF documents using `pypdf`.
+- Split text into searchable sections and generate embeddings.
+- Store and query vectors using **ChromaDB**.
+- Inject relevant context directly into the model prompt to eliminate hallucination. Missing or conflicting data triggers agent uncertainty or escalation.
 
-Identify cases that require further review.
+### 📊 Live Support Dashboard
+A staff-facing monitoring dashboard built using **Server-Sent Events (SSE)** to display:
+- Incoming customer conversations in real time.
+- Agent tool calls and execution results.
+- Handoffs and task transfers between agents.
+- Operational events, case status changes, and decision summaries.
 
-Escalate requests outside its permitted scope.
+---
 
-Manager Agent
+## 🛠️ Technology Stack
 
-The manager agent will review cases escalated by AURA.
+| Technology | Role | Status |
+| :--- | :--- | :--- |
+| **Python** | Backend & agent execution logic | 🟢 In use |
+| **Django** | Application framework & ORM | 🟢 In use |
+| **MySQL** | Relational database storage | 🟢 Configured |
+| **PyMySQL** | MySQL database driver | 🟢 Configured |
+| **python-decouple** | Environment-based secret management | 🟢 In use |
+| **Anthropic API** | Language model & tool-calling engine | 🟡 Planned |
+| **ChromaDB** | Vector database for document retrieval | 🟡 Planned |
+| **pypdf** | PDF text extraction for RAG | 🟡 Planned |
+| **Django Templates / JS** | Application user interface | 🟡 Planned |
+| **Server-Sent Events** | Live agent activity streaming | 🟡 Planned |
+| **Railway** | Production cloud deployment platform | 🟡 Planned |
 
-Planned responsibilities:
+---
 
-Review the customer request and available order information.
+## 📁 Project Structure
 
-Consult company policies.
-
-Request a risk assessment when appropriate.
-
-Decide refund eligibility within defined rules and permissions.
-
-Record the outcome and an explanation for staff review.
-
-Risk Agent
-
-The risk agent will provide supporting assessments for sensitive requests.
-
-Planned responsibilities:
-
-Review available order and customer history.
-
-Identify suspicious patterns or inconsistencies.
-
-Return a structured risk assessment.
-
-Provide supporting findings to the manager agent.
-
-Risk assessments will support case decisions; they will not constitute proof of fraud.
-
-Document Retrieval
-
-A retrieval-augmented generation (RAG) pipeline is planned to provide agents with relevant company information.
-
-The pipeline will:
-
-Extract text from PDF documents using pypdf.
-
-Split documents into searchable sections.
-
-Generate embeddings.
-
-Store and retrieve document sections using ChromaDB.
-
-Supply relevant context to the language model.
-
-Example sources include refund policies, delivery procedures and product documentation.
-
-Retrieval is intended to improve grounding. It does not eliminate incorrect answers, so missing or conflicting information should trigger uncertainty or escalation.
-
-Live Support Dashboard
-
-A staff dashboard is planned to display agent activity using Server-Sent Events (SSE).
-
-Planned information includes:
-
-Incoming customer conversations.
-
-Agent tool calls and their results.
-
-Transfers between agents.
-
-Case status and escalation events.
-
-Decision summaries and outcomes.
-
-The dashboard will expose operational events and explanations, rather than private model reasoning.
-
-Technology Stack
-
-Technology
-
-Role
-
-Status
-
-Python
-
-Backend and agent logic
-
-In use
-
-Django
-
-Application framework and ORM
-
-In use
-
-MySQL
-
-Relational database
-
-Configured
-
-PyMySQL
-
-MySQL database driver
-
-Configured
-
-python-decouple
-
-Environment-based configuration
-
-In use
-
-Anthropic API
-
-Language model and tool calling
-
-Planned
-
-ChromaDB
-
-Vector storage and document retrieval
-
-Planned
-
-pypdf
-
-PDF text extraction
-
-Planned
-
-Django templates, HTML, CSS and JavaScript
-
-Application interface
-
-Planned
-
-Server-Sent Events
-
-Live agent activity updates
-
-Planned
-
-Railway
-
-Application deployment
-
-Planned
-
-The initial implementation will use direct Python orchestration. A future LangChain implementation may be explored after the core workflows are established.
-
-Installed Python dependencies and their versions are recorded in requirements.txt.
-
-Project Structure
-
-Path
-
-Purpose
-
-dj_ai_employee_main/
-
-Project settings, URL routing and application entry points
-
-orders/
-
-Product, order and refund request models, admin configuration and migrations
-
-manage.py
-
-Django management commands
-
-requirements.txt
-
-Installed Python dependencies
-
-.env
-
-Private local configuration, excluded from Git
-
-.gitignore
-
-Git exclusion rules
-
-README.md
-
-Project documentation
-
-Local Setup
-
+```text
+dj_ai_employee_main/   # Project settings, URL routing, and application entry points
+orders/                 # Product, order, and refund models, admin config, and migrations
+docs/                   # Visual assets, diagrams, and documentation
+manage.py               # Django CLI management executable
+requirements.txt        # Production Python dependencies
+.env                    # Private local configuration (excluded from Git)
+.gitignore              # Git exclusion rules
+README.md               # Project documentation
+```
+🚀 Local Setup Guide
 Prerequisites
+Python compatible with Django version in requirements.txt.
 
-Python compatible with the Django version in requirements.txt.
-
-A running MySQL server.
+Running MySQL server and a user account with database creation privileges.
 
 Git.
 
-A MySQL account with access to the application database.
+An Anthropic API key (required once LLM integration is activated).
 
-An Anthropic API key will be needed when the AI integration is implemented. It is not required for the current Django foundation.
+1. Get the Project & Virtual Environment
+Bash
+# Clone the repository and navigate to root directory
+git clone [https://github.com/atinos31/dj_ai_employee_main.git](https://github.com/atinos31/dj_ai_employee_main.git)
+cd ai-support-agents
 
-1. Get the project
-
-Clone this repository and open its root directory—the folder containing manage.py.
-
-2. Create a virtual environment
-
-On macOS or Linux:
-
+# On macOS/Linux:
 python3 -m venv env
 source env/bin/activate
 
-On Windows PowerShell:
-
+# On Windows PowerShell:
 py -m venv env
 .\env\Scripts\Activate.ps1
 
-3. Install dependencies
-
+# Install dependencies
 python -m pip install -r requirements.txt
+2. Create the MySQL Database
+Log into MySQL via CLI or workbench:
 
-4. Create the MySQL database
+SQL
+CREATE DATABASE IF NOT EXISTS ai_employee_db CHARACTER SET utf8mb4;
+EXIT;
+3. Configure Environment Variables
+Create a .env file adjacent to manage.py:
 
-Log in using an account that can create databases:
-
-mysql -u root -p
-
-Create the application database:
-
-CREATE DATABASE IF NOT EXISTS ai_employee_db
-CHARACTER SET utf8mb4;
-
-Exit the MySQL client:
-
-exit;
-
-For shared or deployed environments, use a dedicated application database account with appropriate permissions.
-
-5. Configure environment variables
-
-Create a file named .env beside manage.py.
-
-The configuration below assumes Django settings read these variable names through python-decouple:
-
+Extrait de code
 SECRET_KEY=replace_with_a_generated_secret_key
 DB_NAME=ai_employee_db
 DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
 DB_HOST=localhost
 DB_PORT=3306
+ANTHROPIC_API_KEY=your_claude_api_key
+Tip: Generate a secret key locally: python -c "import secrets; print(secrets.token_urlsafe(64))"
 
-Generate a Django secret key locally:
-
-python -c "import secrets; print(secrets.token_urlsafe(64))"
-
-Copy the generated value into SECRET_KEY in .env.
-
-Keep .env private. Never commit real credentials or API keys.
-
-6. Check the application and prepare the database
-
+4. Apply Migrations & Start Server
+Bash
 python manage.py check
 python manage.py migrate
-
-7. Create an administrator account
-
-Optional:
-
-python manage.py createsuperuser
-
-8. Start the development server
-
+python manage.py createsuperuser  # Optional
 python manage.py runserver
+Application URL: http://127.0.0.1:8000/
 
-Open:
+Django Admin: http://127.0.0.1:8000/admin/
 
-Application: http://127.0.0.1:8000/
+🗺️ Engineering Roadmap
+[x] Initialise the Django project.
 
-Django administration: http://127.0.0.1:8000/admin/
+[x] Configure MySQL connectivity using PyMySQL.
 
-During the initial setup phase, the application may display Django’s default welcome page.
+[x] Introduce environment-based secret configuration.
 
-Roadmap
+[x] Build product, order, and refund request models.
 
-Initialise the Django project.
+[x] Apply initial migrations and load sample seed data.
 
-Configure MySQL connectivity using PyMySQL.
+[ ] Create the customer support interface.
 
-Introduce environment-based secret configuration.
+[ ] Implement business data tools using the Django ORM.
 
-Build product, order and refund request models.
+[ ] Integrate Anthropic Claude API.
 
-Apply the initial orders migration and load sample data.
+[ ] Build AURA’s core agent loop.
 
-Create the customer support interface.
+[ ] Implement Manager and Risk agent coordination.
 
-Implement business data tools using the Django ORM.
+[ ] Add document ingestion and ChromaDB vector retrieval.
 
-Integrate the language model.
+[ ] Stream real-time activity to staff dashboard via SSE.
 
-Build AURA’s agent loop.
+[ ] Implement security safeguards, permissions, and iteration limits.
 
-Implement manager and risk agent coordination.
+[ ] Deploy to Railway.
 
-Add document ingestion and retrieval.
+🔒 Security & Operational Safeguards
+Before production deployment, the platform implements the following security boundaries:
 
-Stream activity to the staff dashboard.
+Credential Protection: Environment-isolated keys and production-hardened Django settings.
 
-Add workflow tests, permission checks and failure handling.
+RBAC & Auth: Granular staff authentication and strict tool-level access permissions for each agent.
 
-Deploy to Railway.
+Loop Safeguards: Strict iteration caps, execution timeouts, and API rate limiting.
 
-Security and Operational Boundaries
+Data Protection: Prompt injection defenses against untrusted documents and customer PII protection in logs.
 
-Before deployment, the application will need:
-
-Protected credentials and production-specific Django settings.
-
-Authentication and authorisation for customer and staff actions.
-
-Tool permissions that restrict what each agent can access or change.
-
-Validation and safeguards around refund operations.
-
-Limits on agent iterations, API usage and execution time.
-
-Handling for tool failures, unavailable services and missing information.
-
-Protection against instructions embedded in untrusted documents.
-
-Appropriate handling of customer data in logs and dashboards.
-
-The application is currently under development and is not presented as production-ready.
-
-Development Cheat Sheet
-
-Recommended VS Code Extensions
-
-Install these from the Extensions panel (Cmd + Shift + X on macOS):
-
-Extension
-
-Publisher
-
-Purpose
-
-Python
-
-Microsoft
-
-Python development support
-
-Pylance
-
-Microsoft
-
-Code completion, import suggestions and type checking
-
-Ruff
-
-Astral
-
-Python formatting and linting
-
-Django
-
-Baptiste Darthenay
-
-Django template highlighting and snippets
-
-GitHub Copilot
-
-GitHub
-
-Optional AI-assisted code suggestions
-
-Editor extensions are optional development tools. They are installed in VS Code, not through pip.
-
-Editor Setup
-
-Open the Command Palette with Cmd + Shift + P.
-
-Run Python: Select Interpreter.
-
-Select the project's env/bin/python.
-
-Open a Python file and run Format Document With….
-
-Choose Configure Default Formatter, then select Ruff.
-
-Enable Editor: Format On Save in Settings.
-
-Useful macOS Shortcuts
-
-Shortcut
-
-Action
-
-Cmd + Shift + P
-
-Open Command Palette
-
-Cmd + Shift + X
-
-Open Extensions
-
-Cmd + P
-
-Find a file
-
-Cmd + S
-
-Save the current file
-
-Cmd + /
-
-Toggle a line comment
-
-Cmd + Shift + V
-
-Preview a Markdown file
-
-Common Project Commands
-
-Run these from the directory containing manage.py.
-
-# Activate the virtual environment on macOS/Linux
+💻 Developer Cheat Sheet
+Bash
+# Activate virtual environment (macOS/Linux)
 source env/bin/activate
 
-# Start the development server
+# Run local development server
 python manage.py runserver
 
-# Check Django configuration
+# Run system integrity check
 python manage.py check
 
-# Create migrations after changing models
+# Database migrations
 python manage.py makemigrations
-
-# Apply database migrations
 python manage.py migrate
 
-# Open the configured MySQL database
+# Access database shell & create superuser
 python manage.py dbshell
-
-# Create an administrator account
 python manage.py createsuperuser
 
-# Run tests
+# Execute test suite
 python manage.py test
+Extensions:
 
-A successful system check validates configuration; it does not verify agent behaviour. Workflow tests will be added alongside the features they cover.
+Python & Pylance (Microsoft) — Intellisense and type checking.
 
-Git Workflow
+Ruff (Astral) — High-performance formatting and linting.
 
-# Review changed files
+Django (Baptiste Darthenay) — Template syntax highlighting.
+
+Configuration:
+
+Open Command Palette (Cmd + Shift + P).
+
+Run Python: Select Interpreter -> Select ./env/bin/python.
+
+Set Ruff as default formatter and enable Editor: Format On Save.
+
+Bash
+# Check status and diff
 git status
 git diff
 
-# Stage a README update
+# Stage and commit intentional updates
 git add README.md
+git commit -m "docs: update comprehensive project guide"
 
-# Review staged changes
-git diff --cached
-
-# Commit the documentation update
-git commit -m "docs: update development cheat sheet"
-
-# Push to the connected remote branch
+# Push to remote branch
 git push
 
-Stage files intentionally and review changes before committing.
+DEVELOPER NOTES
+### ⚡ Django terminal shortcut
 
-Keep .env, passwords and API keys out of Git.
+I use a simple zsh alias to shorten Django commands:
 
-Author
+```bash
+alias pym="python manage.py"
 
-Sandra — Python and Django developer building AI-powered applications.
+Add it to:
+
+~/.zshrc
+
+Then reload your shell:
+
+source ~/.zshrc
+
+Now instead of:
+
+python manage.py runserver
+
+I can use:
+
+pym runserver
+
+And the same works for:
+
+pym migrate
+pym makemigrations
+pym shell
+pym dbshell
+👩‍💻 Author: Sandra Atino — Python & Django Developer building AI-powered systems.

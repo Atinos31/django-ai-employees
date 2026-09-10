@@ -53,4 +53,3 @@ class RefundRequest(models.Model):
 
     def __str__(self):
         return f"Refund Request for Order #{self.order.id} - {self.status}"
-
