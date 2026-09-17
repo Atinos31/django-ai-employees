@@ -28,7 +28,7 @@ class Conversation(models.Model):
 class Message(models.Model):
     class Role(models.TextChoices):
         USER = "user", "User"
-        AGENT = "agent", "Agent"
+        AGENT = "assistant", "Assistant"
 
     conversation = models.ForeignKey(
         Conversation,
@@ -46,22 +46,22 @@ class Message(models.Model):
         ordering = ["created_at"]
 
     def __str__(self):
-        return f"{self.get_role_display()}: {self.content[:50]}"
+        return f"{self.role}: {self.content[:50]}"
 
 
 class AgentLog(models.Model):
     class EventType(models.TextChoices):
-        SUPPORT = "support", "Support Agent"
+        SUPPORT = "support", "Support Assistant"
         TOOL_CALL = "tool_call", "Tool Call"
         TOOL_RESULT = "tool_result", "Tool Result"
-        MANAGER = "manager", "Manager Agent"
-        RISK = "risk", "Risk Agent"
+        MANAGER = "manager", "Manager Assistant"
+        RISK = "risk", "Risk Assistant"
         FINAL = "final", "Final Reply"
 
     conversation = models.ForeignKey(
         Conversation,
         on_delete=models.CASCADE,
-        related_name="agent_logs",
+        related_name="assistant_logs",
     )
     event_type = models.CharField(
         max_length=20,
