@@ -153,3 +153,7 @@ LOGIN_URL = '/login/'  # URL for the login page
 # claude api key and model
 ANTHROPIC_API_KEY = config('ANTHROPIC_API_KEY')
 ANTHROPIC_MODEL = config('ANTHROPIC_MODEL')
+
+# Largest order amount the Manager Agent may approve a refund for on its own.
+# Larger refunds are saved as pending for human staff.
+MANAGER_REFUND_LIMIT = config('MANAGER_REFUND_LIMIT', default=40000, cast=int)
