@@ -75,10 +75,10 @@
     "model": "orders.product",
     "pk": 1,
     "fields": {
-      "name": "CoolBreeze 1 Ton 3 Star Window AC",
-      "description": "Energy efficient 1 ton window AC with 3 star rating, auto restart, sleep mode and dust filter. Ideal for rooms up to 120 sq ft.",
+      "name": "VoltHub Vision 43\" 4K Smart TV",
+      "description": "43 inch 4K UHD smart TV with HDR10, built-in streaming apps, 3 HDMI ports and voice remote. Ideal for bedrooms and small living rooms.",
       "price": "28999.00",
-      "category": "Window AC",
+      "category": "TVs",
       "in_stock": true
     }
   },
@@ -86,10 +86,10 @@
     "model": "orders.product",
     "pk": 2,
     "fields": {
-      "name": "CoolBreeze 1.5 Ton 3 Star Split AC",
-      "description": "1.5 ton split AC with 3 star rating, turbo cool technology, auto clean and dehumidifier function. Ideal for rooms up to 180 sq ft.",
+      "name": "VoltHub Nova 5G Phone 128GB",
+      "description": "6.5 inch AMOLED smartphone with 5G, 50MP triple camera, 5000mAh battery and 33W fast charging.",
       "price": "34999.00",
-      "category": "Split AC",
+      "category": "Phones",
       "in_stock": true
     }
   },
@@ -97,10 +97,10 @@
     "model": "orders.product",
     "pk": 3,
     "fields": {
-      "name": "CoolBreeze 1.5 Ton 5 Star Inverter Split AC",
-      "description": "Premium 1.5 ton inverter split AC with 5 star rating, wifi control, auto diagnosis and 4 way swing. Ideal for rooms up to 180 sq ft.",
+      "name": "VoltHub AirBook 14 Laptop",
+      "description": "14 inch FHD laptop with Intel Core i5, 16GB RAM, 512GB SSD, backlit keyboard and all-day battery life.",
       "price": "42999.00",
-      "category": "Split AC",
+      "category": "Laptops",
       "in_stock": true
     }
   },
@@ -108,10 +108,10 @@
     "model": "orders.product",
     "pk": 4,
     "fields": {
-      "name": "CoolBreeze 2 Ton 3 Star Split AC",
-      "description": "Heavy duty 2 ton split AC with 3 star rating, rapid cooling, self cleaning filter and auto restart after power cut. Ideal for rooms up to 240 sq ft.",
+      "name": "VoltHub Vision 55\" QLED TV",
+      "description": "55 inch 4K QLED smart TV with Dolby Vision, 120Hz motion, Dolby Atmos sound and hands-free voice control.",
       "price": "45999.00",
-      "category": "Split AC",
+      "category": "TVs",
       "in_stock": true
     }
   },
@@ -119,10 +119,10 @@
     "model": "orders.product",
     "pk": 5,
     "fields": {
-      "name": "CoolBreeze 1 Ton 5 Star Inverter Split AC",
-      "description": "Compact 1 ton inverter split AC with 5 star rating, voice control, pm 2.5 filter and weekly timer. Ideal for rooms up to 120 sq ft.",
+      "name": "VoltHub Nova Pro 5G Phone 256GB",
+      "description": "6.7 inch 120Hz AMOLED smartphone with 5G, 200MP camera, wireless charging and IP68 water resistance.",
       "price": "38999.00",
-      "category": "Split AC",
+      "category": "Phones",
       "in_stock": true
     }
   },
@@ -130,10 +130,10 @@
     "model": "orders.product",
     "pk": 6,
     "fields": {
-      "name": "CoolBreeze 2 Ton 5 Star Inverter Cassette AC",
-      "description": "Commercial grade 2 ton cassette AC with 5 star inverter rating, 360 degree airflow, central drain pump and remote diagnostics. Ideal for offices up to 300 sq ft.",
+      "name": "VoltHub ProBook 16 Laptop",
+      "description": "16 inch 2.5K laptop with Intel Core i7, 32GB RAM, 1TB SSD and dedicated graphics. Built for creators and developers.",
       "price": "68999.00",
-      "category": "Cassette AC",
+      "category": "Laptops",
       "in_stock": true
     }
   },
@@ -141,10 +141,10 @@
     "model": "orders.product",
     "pk": 7,
     "fields": {
-      "name": "CoolBreeze 1.5 Ton Portable AC",
-      "description": "No installation required portable AC with 1.5 ton capacity, dual fan speed, dehumidifier mode and 24 hour timer. Ideal for temporary cooling needs.",
+      "name": "VoltHub Tab 11 Tablet",
+      "description": "11 inch 2K tablet with 8GB RAM, 256GB storage, stylus support and quad speakers.",
       "price": "32999.00",
-      "category": "Portable AC",
+      "category": "Tablets",
       "in_stock": true
     }
   },
@@ -152,10 +152,10 @@
     "model": "orders.product",
     "pk": 8,
     "fields": {
-      "name": "CoolBreeze 2 Ton Tower AC",
-      "description": "Floor standing 2 ton tower AC with inverter technology, 7 speed fan, air purifier with HEPA filter and child lock. Ideal for large halls up to 280 sq ft.",
+      "name": "VoltHub Vision 65\" 4K Smart TV",
+      "description": "65 inch 4K UHD smart TV with HDR10+, 60W speakers, auto low latency gaming mode and wall mount kit.",
       "price": "55999.00",
-      "category": "Tower AC",
+      "category": "TVs",
       "in_stock": true
     }
   },
@@ -163,8 +163,8 @@
     "model": "orders.product",
     "pk": 9,
     "fields": {
-      "name": "CoolBreeze AC Voltage Stabilizer 5KVA",
-      "description": "Heavy duty voltage stabilizer for ACs up to 2 ton. Protects against voltage fluctuations between 90V to 290V with time delay and digital display.",
+      "name": "VoltHub Buds Pro Wireless Earbuds",
+      "description": "True wireless earbuds with active noise cancellation, 30 hour battery with case and USB-C fast charging.",
       "price": "4999.00",
       "category": "Accessories",
       "in_stock": true
@@ -174,8 +174,8 @@
     "model": "orders.product",
     "pk": 10,
     "fields": {
-      "name": "CoolBreeze Universal AC Remote Control",
-      "description": "Universal remote compatible with all CoolBreeze AC models. Features LCD display, timer, sleep mode and turbo button. Includes 2 AAA batteries.",
+      "name": "VoltHub 25W USB-C Fast Charger",
+      "description": "25W USB-C wall charger with fast charging support for phones and tablets. Includes 1m USB-C cable.",
       "price": "899.00",
       "category": "Accessories",
       "in_stock": true
@@ -187,7 +187,7 @@
     "fields": {
       "user": 2,
       "product": 3,
-      "product_name": "CoolBreeze 1.5 Ton 5 Star Inverter Split AC",
+      "product_name": "VoltHub AirBook 14 Laptop",
       "amount": "42999.00",
       "status": "dispatched",
       "carrier": "BlueDart",
@@ -203,7 +203,7 @@
     "fields": {
       "user": 2,
       "product": 2,
-      "product_name": "CoolBreeze 1.5 Ton 3 Star Split AC",
+      "product_name": "VoltHub Nova 5G Phone 128GB",
       "amount": "34999.00",
       "status": "delivered",
       "carrier": "Delhivery",
@@ -219,7 +219,7 @@
     "fields": {
       "user": 2,
       "product": 9,
-      "product_name": "CoolBreeze AC Voltage Stabilizer 5KVA",
+      "product_name": "VoltHub Buds Pro Wireless Earbuds",
       "amount": "4999.00",
       "status": "delivered",
       "carrier": "Delhivery",
@@ -235,7 +235,7 @@
     "fields": {
       "user": 2,
       "product": 10,
-      "product_name": "CoolBreeze Universal AC Remote Control",
+      "product_name": "VoltHub 25W USB-C Fast Charger",
       "amount": "899.00",
       "status": "cancelled",
       "carrier": "",
@@ -251,7 +251,7 @@
     "fields": {
       "user": 2,
       "product": 5,
-      "product_name": "CoolBreeze 1 Ton 5 Star Inverter Split AC",
+      "product_name": "VoltHub Nova Pro 5G Phone 256GB",
       "amount": "38999.00",
       "status": "pending",
       "carrier": "",
@@ -267,7 +267,7 @@
     "fields": {
       "user": 3,
       "product": 6,
-      "product_name": "CoolBreeze 2 Ton 5 Star Inverter Cassette AC",
+      "product_name": "VoltHub ProBook 16 Laptop",
       "amount": "68999.00",
       "status": "dispatched",
       "carrier": "Ekart",
@@ -283,7 +283,7 @@
     "fields": {
       "user": 3,
       "product": 4,
-      "product_name": "CoolBreeze 2 Ton 3 Star Split AC",
+      "product_name": "VoltHub Vision 55\" QLED TV",
       "amount": "45999.00",
       "status": "delivered",
       "carrier": "BlueDart",
@@ -299,7 +299,7 @@
     "fields": {
       "user": 4,
       "product": 1,
-      "product_name": "CoolBreeze 1 Ton 3 Star Window AC",
+      "product_name": "VoltHub Vision 43\" 4K Smart TV",
       "amount": "28999.00",
       "status": "delivered",
       "carrier": "Delhivery",
@@ -315,7 +315,7 @@
     "fields": {
       "user": 4,
       "product": 8,
-      "product_name": "CoolBreeze 2 Ton Tower AC",
+      "product_name": "VoltHub Vision 65\" 4K Smart TV",
       "amount": "55999.00",
       "status": "dispatched",
       "carrier": "BlueDart",
@@ -331,7 +331,7 @@
     "fields": {
       "user": 3,
       "product": 7,
-      "product_name": "CoolBreeze 1.5 Ton Portable AC",
+      "product_name": "VoltHub Tab 11 Tablet",
       "amount": "32999.00",
       "status": "pending",
       "carrier": "",
@@ -347,7 +347,7 @@
     "fields": {
       "order": 3,
       "user": 2,
-      "reason": "Stabilizer stopped working after 3 days. AC not turning on.",
+      "reason": "Left earbud stopped charging after 3 days. Only the right one works.",
       "status": "approved",
       "created_at": "2025-02-20T10:00:00Z"
     }
@@ -358,7 +358,7 @@
     "fields": {
       "order": 2,
       "user": 2,
-      "reason": "AC is making loud noise during operation. Not acceptable.",
+      "reason": "Battery drains too quickly and the phone gets warm. Not what I expected.",
       "status": "denied",
       "created_at": "2025-03-20T14:30:00Z"
     }
@@ -369,7 +369,7 @@
     "fields": {
       "order": 7,
       "user": 3,
-      "reason": "AC not cooling properly even after installation by technician.",
+      "reason": "TV arrived with a cracked screen corner. Box was damaged in transit.",
       "status": "approved",
       "created_at": "2025-03-10T09:00:00Z"
     }
@@ -380,7 +380,7 @@
     "fields": {
       "order": 8,
       "user": 4,
-      "reason": "Window AC leaking water inside the room.",
+      "reason": "TV has vertical lines on the left side of the screen.",
       "status": "pending",
       "created_at": "2025-03-25T16:00:00Z"
     }
@@ -391,7 +391,7 @@
     "fields": {
       "order": 1,
       "user": 2,
-      "reason": "AC dispatched 5 days ago but not delivered yet. Want refund.",
+      "reason": "Laptop dispatched 5 days ago but not delivered yet. Want refund.",
       "status": "pending",
       "created_at": "2025-04-30T11:00:00Z"
     }

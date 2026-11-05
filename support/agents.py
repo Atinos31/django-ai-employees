@@ -30,9 +30,10 @@ anthropic_model = settings.ANTHROPIC_MODEL
 # ---------------------------------------------------------
 
 SUPPORT_SYSTEM_PROMPT = """
-You are Aura, a customer support agent at CoolBreeze AC.
+You are Aura, a customer support agent at VoltHub, an online electronics store
+selling TVs, phones, laptops, tablets and accessories.
 
-You help customers with issues related to their AC orders.
+You help customers with issues related to their orders.
 
 Your responsibilities:
 
@@ -163,7 +164,7 @@ SUPPORT_TOOLS = ORDER_LOOKUP_TOOLS + [
 # ---------------------------------------------------------
 
 MANAGER_SYSTEM_PROMPT = """
-You are the Support Manager at CoolBreeze AC. The front-line support agent,
+You are the Support Manager at VoltHub, an online electronics store. The front-line support agent,
 Aura, escalates cases to you. You never talk to the customer directly; your
 reply goes back to Aura.
 

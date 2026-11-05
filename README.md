@@ -7,7 +7,7 @@
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-000000?style=flat-square&logo=databricks&logoColor=white)
 ![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)
 
-An enterprise-grade, multi-agent AI customer support platform built from first principles for **CoolBreeze AC**. 
+An enterprise-grade, multi-agent AI customer support platform built from first principles for **VoltHub**, an online electronics store selling TVs, phones, laptops and accessories. 
 
 Instead of relying solely on high-level frameworks like LangChain, this system implements the **agent loop, custom tool-calling, and multi-agent orchestration directly in pure Python**, backed by Django ORM models and real-time streaming interfaces.
 
