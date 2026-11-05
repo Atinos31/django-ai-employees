@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your cart — VoltHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+      color: #1a1a2e;
+    }
+
+    .page-header {
+      padding: 32px 0 16px;
+    }
+
+    .page-header h5 {
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .cart-line {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .line-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .line-meta {
+      font-size: 12px;
+      color: #6c757d;
+      margin: 4px 0 0;
+    }
+
+    .line-total {
+      font-weight: 700;
+      min-width: 110px;
+      text-align: right;
+    }
+
+    .qty-select {
+      border-radius: 8px;
+      font-size: 13px;
+      width: auto;
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: #dc3545;
+      font-size: 13px;
+      padding: 0;
+    }
+
+    .summary {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .btn-main {
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      width: 100%;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-main:hover {
+      background: #2d2d4e;
+      color: #fff;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #6c757d;
+      text-align: center;
+      margin: 12px 0 0;
+    }
+  </style>
+</head>
+<body>
+
+{% include 'partials/navbar.html' %}
+
+<div class="container pb-5">
+
+  {% include 'partials/messages.html' %}
+
+  <div class="page-header">
+    <h5>Your cart</h5>
+  </div>
+
+  {% if lines %}
+    <div class="row g-4">
+
+      <div class="col-lg-8">
+        {% for line in lines %}
+          <div class="cart-line">
+            <div>
+              <p class="line-name">{{ line.product.name }}</p>
+              <p class="line-meta">₹{{ line.product.price }} each</p>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+              <form method="POST" action="{% url 'cart_update' line.product.id %}">
+                {% csrf_token %}
+                <select name="quantity" class="form-select form-select-sm qty-select"
+                        onchange="this.form.submit()" aria-label="Quantity">
+                  {% for n in quantity_range %}
+                    <option value="{{ n }}"{% if n == line.quantity %} selected{% endif %}>{{ n }}</option>
+                  {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn btn-sm btn-light">Update</button></noscript>
+              </form>
+
+              <span class="line-total">₹{{ line.line_total }}</span>
+
+              <form method="POST" action="{% url 'cart_remove' line.product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-remove">Remove</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="col-lg-4">
+        <div class="summary">
+          <div class="summary-total">
+            <span>Total</span>
+            <span>₹{{ total }}</span>
+          </div>
+
+          {% if user.is_authenticated %}
+            <button type="button" class="btn-main" disabled style="opacity:0.6;cursor:not-allowed;">
+              Checkout (coming soon)
+            </button>
+            <p class="note">Secure payment with Stripe is the next step.</p>
+          {% else %}
+            <a href="{% url 'login' %}?next={% url 'cart_detail' %}" class="btn-main">Sign in to check out</a>
+            <p class="note">
+              New here? <a href="{% url 'signup' %}" class="text-dark fw-semibold">Create an account</a>.
+              Your cart is kept when you sign in.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  {% else %}
+    <div style="text-align:center;padding:60px 0;color:#6c757d;">
+      <p>Your cart is empty.</p>
+      <a href="{% url 'product_list' %}" class="btn-main d-inline-block" style="width:auto;padding:10px 24px;">Browse the shop</a>
+    </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

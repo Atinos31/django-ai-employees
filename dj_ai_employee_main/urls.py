@@ -30,6 +30,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name="logout"),
     path('signup/', include('accounts.urls')),
 
+    path('shop/', include('shop.urls')),
+
     path('orders/', include('orders.urls')),
 
     path('support/', include('support.urls')),
