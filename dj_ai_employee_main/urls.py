@@ -17,8 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    # Landing page
+    path('', TemplateView.as_view(template_name="home.html"), name="home"),
+
     path('admin/', admin.site.urls),
 
     # Login Endpoint
