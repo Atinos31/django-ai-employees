@@ -1,0 +1,12 @@
+{# One agent step or chat message. Keep in sync with renderEvent() in static/js/live-dashboard.js #}
+<div class="vh-event agent-{{ event.agent|lower }}">
+  <div class="vh-event-head">
+    <span class="vh-agent">{{ event.agent }}</span>
+    <span class="vh-event-title">{{ event.title }}</span>
+    <span class="vh-event-time" title="{{ event.when }}">{{ event.clock }}</span>
+  </div>
+  {% if show_context %}
+    <a class="vh-event-context" href="{% url 'support_conversation' event.conversation_id %}">{{ event.customer }} · Order #{{ event.order_id }}</a>
+  {% endif %}
+  {% if event.detail %}<div class="vh-event-detail">{{ event.detail }}</div>{% endif %}
+</div>

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support dashboard — VoltHub{% endblock %}
+
+{% block content %}
+<div class="vh-container" style="padding-bottom:64px;">
+
+  <div class="vh-dash-head">
+    <div>
+      <h1 class="vh-page-title" style="padding-bottom:4px;">Support dashboard.</h1>
+      <p class="vh-muted" style="margin:0;">Conversations handled by Aura, the Manager Agent and the Risk Agent.</p>
+    </div>
+    <span class="vh-live" id="live-status"><span class="dot"></span><span class="label">Connecting…</span></span>
+  </div>
+
+  <div class="vh-dash-grid">
+
+    <section>
+      <h2 class="vh-dash-h2">Conversations</h2>
+      <div class="vh-notice" id="new-conversations" hidden>
+        New conversations have started. <a href="{% url 'support_dashboard' %}">Refresh</a>
+      </div>
+
+      {% if rows %}
+        <div class="vh-card white" style="padding:4px 24px;">
+          {% for row in rows %}
+            <a class="vh-conv-row" id="conv-{{ row.conversation.id }}" href="{% url 'support_conversation' row.conversation.id %}">
+              <div style="min-width:0;">
+                <p class="vh-row-title">{{ row.conversation.user.username }} · Order #{{ row.conversation.order_id }}</p>
+                <p class="vh-row-meta" data-last-message>{{ row.last_customer_message|default:"No messages yet"|truncatechars:90 }}</p>
+              </div>
+              <div class="vh-conv-badges">
+                {% if row.manager_involved %}<span class="vh-badge">Manager</span>{% endif %}
+                {% if row.risk_level %}<span class="vh-badge risk-{{ row.risk_level }}">{{ row.risk_level|capfirst }} risk</span>{% endif %}
+                {% if row.refund_status %}<span class="vh-badge {{ row.refund_status_key }}">Refund {{ row.refund_status|lower }}</span>{% endif %}
+                <span class="vh-row-meta" data-last-activity>{{ row.last_activity|date:"j M, H:i" }}</span>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="vh-card" style="text-align:center;">
+          <p class="vh-muted" style="margin:0;">No conversations yet. They appear here as soon as a customer chats with Aura.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <aside>
+      <h2 class="vh-dash-h2">Live activity</h2>
+      <div class="vh-feed" id="feed">
+        {% for event in feed %}
+          {% include 'support/partials/event.html' with event=event show_context=True %}
+        {% endfor %}
+      </div>
+      <p class="vh-small vh-muted" id="feed-empty"{% if feed %} hidden{% endif %}>Waiting for activity…</p>
+    </aside>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/live-dashboard.js' %}"></script>
+<script>
+  startLiveUpdates({
+    streamUrl: "{% url 'support_stream' %}",
+    eventsUrl: "{% url 'support_events' %}",
+    cursor: "{{ cursor }}",
+    pollMs: {{ poll_ms }},
+    status: document.getElementById("live-status"),
+    onEvent(event) {
+      document.getElementById("feed-empty").hidden = true;
+      const link = "{% url 'support_dashboard' %}" + event.conversation_id + "/";
+      document.getElementById("feed").prepend(renderEvent(event, { showContext: true, link }));
+
+      const row = document.getElementById("conv-" + event.conversation_id);
+      if (row) {
+        row.classList.remove("flash");
+        void row.offsetWidth;  // restart the highlight animation
+        row.classList.add("flash");
+        row.querySelector("[data-last-activity]").textContent = "just now";
+        if (event.kind === "message" && event.agent === "Customer") {
+          const text = event.detail.length > 90 ? event.detail.slice(0, 89) + "…" : event.detail;
+          row.querySelector("[data-last-message]").textContent = text;
+        }
+      } else {
+        document.getElementById("new-conversations").hidden = false;
+      }
+    },
+  });
+</script>
+{% endblock %}

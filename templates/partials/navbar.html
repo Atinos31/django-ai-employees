@@ -13,6 +13,7 @@
 
     <div class="vh-nav-links">
       {% if user.is_authenticated %}
+        {% if user.is_staff %}<a href="{% url 'support_dashboard' %}">Dashboard</a>{% endif %}
         <a href="{% url 'orders_list' %}">Orders</a>
         <form method="POST" action="{% url 'logout' %}">
           {% csrf_token %}

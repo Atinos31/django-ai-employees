@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Conversation #{{ conversation.id }} — VoltHub staff{% endblock %}
+
+{% block content %}
+<div class="vh-container" style="padding-bottom:64px;">
+
+  <p style="margin:28px 0 0;"><a href="{% url 'support_dashboard' %}" class="vh-small">‹ Support dashboard</a></p>
+
+  <div class="vh-dash-head">
+    <div>
+      <h1 style="font-size:36px;line-height:1.1;margin:12px 0 6px;">
+        {{ conversation.user.username }} · Order #{{ conversation.order_id }}
+      </h1>
+      <p class="vh-muted" style="margin:0;">
+        {{ conversation.order.product_name }} · {{ conversation.order.amount|money }} ·
+        <span class="vh-badge {{ conversation.order.status }}">{{ conversation.order.get_status_display }}</span>
+      </p>
+      <div class="vh-conv-badges" style="justify-content:flex-start;margin-top:12px;">
+        <span class="vh-badge" id="badge-manager"{% if not summary.manager_involved %} hidden{% endif %}>Manager involved</span>
+        <span class="vh-badge risk-{{ summary.risk_level|default:'low' }}" id="badge-risk"{% if not summary.risk_level %} hidden{% endif %}>{{ summary.risk_level|capfirst }} risk</span>
+        {% if summary.refund_status %}<span class="vh-badge {{ summary.refund_status_key }}">Refund {{ summary.refund_status|lower }}</span>{% endif %}
+      </div>
+    </div>
+    <span class="vh-live" id="live-status"><span class="dot"></span><span class="label">Connecting…</span></span>
+  </div>
+
+  <div class="vh-dash-grid">
+
+    <section>
+      <h2 class="vh-dash-h2">Conversation</h2>
+      <div class="vh-card white vh-transcript" id="transcript">
+        {% for message in chat_messages %}
+          <div class="vh-bubble {% if message.agent == 'Customer' %}customer{% else %}agent{% endif %}">{{ message.detail }}<span class="vh-bubble-time">{{ message.clock }}</span></div>
+        {% endfor %}
+        <p class="vh-muted vh-small" id="transcript-empty" style="margin:0;"{% if chat_messages %} hidden{% endif %}>No messages yet.</p>
+      </div>
+    </section>
+
+    <aside>
+      <h2 class="vh-dash-h2">Agent activity</h2>
+      <div class="vh-feed vh-steps" id="steps">
+        {% for event in steps %}
+          {% include 'support/partials/event.html' with event=event %}
+        {% endfor %}
+      </div>
+      <p class="vh-small vh-muted" id="steps-empty"{% if steps %} hidden{% endif %}>No agent steps yet.</p>
+    </aside>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/live-dashboard.js' %}"></script>
+<script>
+  const steps = document.getElementById("steps");
+  steps.scrollTop = steps.scrollHeight;
+
+  startLiveUpdates({
+    streamUrl: "{% url 'support_stream' %}",
+    eventsUrl: "{% url 'support_events' %}",
+    cursor: "{{ cursor }}",
+    conversationId: {{ conversation.id }},
+    pollMs: {{ poll_ms }},
+    status: document.getElementById("live-status"),
+    onEvent(event) {
+      if (event.kind === "message") {
+        document.getElementById("transcript-empty").hidden = true;
+        const bubble = document.createElement("div");
+        bubble.className = "vh-bubble " + (event.agent === "Customer" ? "customer" : "agent");
+        bubble.textContent = event.detail;
+        const time = document.createElement("span");
+        time.className = "vh-bubble-time";
+        time.textContent = event.clock;
+        bubble.append(time);
+        document.getElementById("transcript").insertBefore(bubble, document.getElementById("transcript-empty"));
+        return;
+      }
+
+      document.getElementById("steps-empty").hidden = true;
+      steps.append(renderEvent(event));
+      steps.scrollTop = steps.scrollHeight;
+
+      if (event.agent === "Manager") document.getElementById("badge-manager").hidden = false;
+      if (event.risk_level) {
+        const badge = document.getElementById("badge-risk");
+        badge.className = "vh-badge risk-" + event.risk_level;
+        badge.textContent = event.risk_level[0].toUpperCase() + event.risk_level.slice(1) + " risk";
+        badge.hidden = false;
+      }
+    },
+  });
+</script>
+{% endblock %}

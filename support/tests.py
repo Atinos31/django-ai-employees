@@ -8,6 +8,7 @@ cost nothing and always behave the same. Run with:
     python manage.py test support
 """
 
+import threading
 from types import SimpleNamespace
 from unittest import mock
 
@@ -15,13 +16,14 @@ from django.contrib.auth.models import User
 from django.test import Client, SimpleTestCase, TestCase
 
 from orders.models import Order, RefundRequest
-from support import agents
+from support import agents, dashboard_views
 from support.fraud_test_data import (
     DemoDataError,
     remove_fraud_test_data,
     seed_fraud_test_data,
 )
 from support.models import AgentLog, Conversation, Message
+from support.live import current_cursor, describe_log
 from support.tools import get_customer_risk_profile, record_refund_decision
 
 
@@ -323,3 +325,102 @@ class MultiAgentWiringTests(TestCase):
         self.assertEqual(refund.reason, "Damaged product claim")
         self.assertIn("referred to a specialist", reply)
         self.assertNotIn("Approve", reply)
+
+
+# ---------------------------------------------------------
+# STAFF DASHBOARD AND LIVE STREAM
+# ---------------------------------------------------------
+
+class DashboardTests(TestCase):
+    fixtures = ["demo_data"]
+
+    def setUp(self):
+        seed_fraud_test_data()
+        self.staff = User.objects.get(username="admin")
+        self.customer = User.objects.get(username="nina")
+        order = live_case("nina")
+        self.conversation = Conversation.objects.create(user=order.user, order=order)
+        Message.objects.create(conversation=self.conversation, role="user", content="My TV arrived cracked.")
+        AgentLog.objects.create(conversation=self.conversation, event_type="tool_call",
+                                message="[Aura] Calling get_order_details with {}")
+        AgentLog.objects.create(conversation=self.conversation, event_type="risk",
+                                message="[Risk] Final assessment: level=low score=12 "
+                                        "recommendation=proceed source=risk_agent")
+
+    def client_for(self, user):
+        client = Client()
+        client.force_login(user)
+        return client
+
+    def stream(self, client, params=None, **headers):
+        with mock.patch.object(dashboard_views, "STREAM_MAX_SECONDS", 0.3), \
+             mock.patch.object(dashboard_views, "STREAM_POLL_SECONDS", 0.05):
+            response = client.get("/support/dashboard/stream/", params or {}, **headers)
+            self.assertEqual(response["Content-Type"], "text/event-stream")
+            return b"".join(response.streaming_content).decode()
+
+    def test_dashboard_is_staff_only(self):
+        urls = [
+            "/support/dashboard/",
+            f"/support/dashboard/{self.conversation.id}/",
+            "/support/dashboard/stream/",
+            "/support/dashboard/events/",
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertEqual(Client().get(url).status_code, 302)
+                self.assertEqual(self.client_for(self.customer).get(url).status_code, 302)
+
+    def test_dashboard_lists_conversations_with_badges(self):
+        page = self.client_for(self.staff).get("/support/dashboard/").content.decode()
+        self.assertIn(f"nina · Order #{self.conversation.order_id}", page)
+        self.assertIn("Low risk", page)
+        self.assertIn("Live activity", page)
+
+    def test_conversation_page_shows_messages_and_agent_steps(self):
+        page = self.client_for(self.staff).get(f"/support/dashboard/{self.conversation.id}/").content.decode()
+        self.assertIn("My TV arrived cracked.", page)
+        self.assertIn("Uses get_order_details", page)
+        self.assertNotIn("'kind': 'message'", page)  # chat list must not leak into flash notices
+
+    def test_events_endpoint_returns_only_new_events(self):
+        client = self.client_for(self.staff)
+        cursor = current_cursor()
+        AgentLog.objects.create(conversation=self.conversation, event_type="manager",
+                                message="[Manager] Decision: Approved.")
+
+        data = client.get("/support/dashboard/events/", {"cursor": cursor}).json()
+        self.assertEqual([(e["agent"], e["title"]) for e in data["events"]], [("Manager", "Decision")])
+
+        again = client.get("/support/dashboard/events/", {"cursor": data["cursor"]}).json()
+        self.assertEqual(again["events"], [])
+
+    def test_stream_sends_events_then_closes(self):
+        body = self.stream(self.client_for(self.staff), {"cursor": "0:0", "conversation": self.conversation.id})
+        self.assertIn("retry: 3000", body)
+        self.assertIn("id: ", body)
+        self.assertIn("Uses get_order_details", body)
+        self.assertIn("My TV arrived cracked.", body)
+
+    def test_stream_resumes_from_last_event_id(self):
+        cursor = current_cursor(self.conversation.id)
+        AgentLog.objects.create(conversation=self.conversation, event_type="manager",
+                                message="[Manager] Decision: Referred to a specialist.")
+
+        body = self.stream(self.client_for(self.staff), {"conversation": self.conversation.id},
+                           HTTP_LAST_EVENT_ID=cursor)
+        self.assertIn("Referred to a specialist", body)
+        self.assertNotIn("get_order_details", body)
+
+    def test_too_many_streams_switches_the_browser_to_polling(self):
+        slots = threading.BoundedSemaphore(1)
+        slots.acquire()  # the only slot is already taken
+        with mock.patch.object(dashboard_views, "_stream_slots", slots):
+            body = self.stream(self.client_for(self.staff))
+        self.assertIn('"type": "busy"', body)
+
+    def test_describe_log_reads_agent_and_risk_level(self):
+        event = describe_log(AgentLog.objects.get(event_type="risk", conversation=self.conversation))
+        self.assertEqual(event["agent"], "Risk")
+        self.assertEqual(event["risk_level"], "low")
+        self.assertEqual(event["risk_score"], 12)

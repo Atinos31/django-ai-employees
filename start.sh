@@ -15,12 +15,14 @@ python manage.py collectstatic --noinput
 python manage.py build_knowledge_base \
     || echo "WARNING: knowledge base build failed; the shop still works without it"
 
-# 4. Web server. One worker because state such as the live event queue is
-#    kept in memory; threads handle concurrent requests. Agent chains can
-#    take ~30 seconds, hence the long timeout.
+# 4. Web server. One worker (Railway volumes rule out replicas); threads
+#    handle concurrent requests. Each open staff dashboard holds a thread for
+#    its live stream (at most 4, see support/dashboard_views.py), so 12
+#    threads leave room for customers. Agent chains can take ~30 seconds,
+#    hence the long timeout.
 exec gunicorn dj_ai_employee_main.wsgi \
     --bind "0.0.0.0:${PORT:-8000}" \
     --workers 1 \
-    --threads 8 \
+    --threads 12 \
     --timeout 300 \
     --access-logfile -

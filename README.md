@@ -68,7 +68,27 @@ VoltHub shows how AI agents can take this work on safely. Routine questions are 
 
 ### For staff
 
-Every refund request is saved with **two separate texts**: the customer's claim, shown to the customer, and the Manager Agent's internal reasoning, visible to staff only. Every agent step (tool calls, results, decisions) is stored in an `AgentLog`.
+**Live support dashboard** at `/support/dashboard/` (staff only). Every conversation is listed with badges for Manager involvement, risk level and refund outcome. Open one to see the chat next to every agent step (Aura → Manager → Risk Agent) appearing live as it happens.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/screenshots/staff-dashboard.png" alt="Support dashboard with live activity feed"></td>
+<td width="50%"><img src="docs/images/screenshots/staff-conversation.png" alt="One conversation with the agent steps"></td>
+</tr>
+<tr>
+<td><sub>Conversations and the live activity feed, captured during a real chat.</sub></td>
+<td><sub>The chat next to the agent steps: risk check, decision and reply.</sub></td>
+</tr>
+</table>
+
+The live view uses Server-Sent Events, built to be safe on a small server:
+- **No lost events.** Every agent step is already saved, and the stream sends rows newer than the last one the browser received. After a restart or reconnect it carries on where it stopped.
+- **Can't freeze the shop.** Each stream closes after 2 minutes and the browser reconnects by itself. A heartbeat keeps proxies from dropping idle connections. At most 4 streams run at once; extra tabs check for updates every few seconds instead.
+- **Staff only.** The stream shows customer data and internal reasoning, so customers can't open it.
+
+<img src="docs/images/sse-streaming-workflow.png" alt="Agent events flowing to a live dashboard" width="520">
+
+Every refund request is also saved with **two separate texts**: the customer's claim, shown to the customer, and the Manager Agent's internal reasoning, visible to staff only. Every agent step (tool calls, results, decisions) is stored in an `AgentLog`.
 
 ![Staff view of refund requests with internal decision notes](docs/images/screenshots/staff-admin-refunds.png)
 
@@ -136,7 +156,7 @@ The model makes judgments; the code enforces the rules. Each of these holds even
 
 ## Tested with real conversations
 
-**22 automated tests** cover the risk profile, the guardrails and the full Aura → Manager → Risk Agent handoff. The handoff tests use a scripted fake Claude, so they run offline and always behave the same:
+**30 automated tests** cover the risk profile, the guardrails, the full Aura → Manager → Risk Agent handoff and the live dashboard. The handoff tests use a scripted fake Claude, so they run offline and always behave the same:
 
 ```bash
 python manage.py test support
@@ -268,13 +288,15 @@ shop/                Catalog, bag, Stripe checkout, template filters
 support/
   agents.py          Aura, Manager and Risk Agent prompts, tools and the shared agent loop
   tools.py           Order lookups, risk profile and refund decisions with guardrails
+  live.py            Live agent activity: events, cursors and dashboard badges
+  dashboard_views.py Staff dashboard pages and the live stream (SSE)
   knowledge_base.py  ChromaDB knowledge base (build and search)
   documents/         Company policies loaded into the knowledge base
   fraud_test_data.py Demo customers with low, medium and high risk patterns
   management/        build_knowledge_base and seed_fraud_data commands
-  tests.py           22 tests, including the multi-agent handoff
+  tests.py           30 tests: risk, guardrails, multi-agent handoff, dashboard
 templates/           Pages (all extend base.html)
-static/css/          The VoltHub design system
+static/              The VoltHub design system (css/) and the live dashboard script (js/)
 start.sh, Procfile   Production start-up for Railway
 ```
 
@@ -284,12 +306,10 @@ start.sh, Procfile   Production start-up for Railway
 
 ### Next up
 
-1. **Live staff dashboard.** Watch conversations and agent steps as they happen, using Server-Sent Events. Planned improvements over a basic version: staff-only access, and a heartbeat and timeout so open tabs can't tie up the server.
-   <br><img src="docs/images/sse-streaming-workflow.png" alt="Agent events flowing through a queue to a live dashboard" width="520">
-2. **Connect the knowledge base to Aura.** The policies are already loaded into ChromaDB (3 documents, 16 chunks). Next: a `search_knowledge_base` tool so Aura answers policy questions from the documents and admits when they don't cover something. Also record delivery dates, so the 14-day change-of-mind rule counts from delivery, as the policy says, instead of from the order date.
-3. **LangChain edition.** Rebuild the agents with LangChain to compare with the hand-written loop, keeping the order-bound tools and the code guardrails.
-4. **Stripe webhooks and real refunds.** Create orders from Stripe's `checkout.session.completed` event, so a customer who closes the browser after paying still gets their order. Approved refunds should also return the money through Stripe's Refund API; today they are recorded only.
-5. **Refund review queue.** A staff page to approve or deny pending refunds, with an audit trail, instead of the Django admin.
+1. **Connect the knowledge base to Aura.** The policies are already loaded into ChromaDB (3 documents, 16 chunks). Next: a `search_knowledge_base` tool so Aura answers policy questions from the documents and admits when they don't cover something. Also record delivery dates, so the 14-day change-of-mind rule counts from delivery, as the policy says, instead of from the order date.
+2. **LangChain edition.** Rebuild the agents with LangChain to compare with the hand-written loop, keeping the order-bound tools and the code guardrails.
+3. **Stripe webhooks and real refunds.** Create orders from Stripe's `checkout.session.completed` event, so a customer who closes the browser after paying still gets their order. Approved refunds should also return the money through Stripe's Refund API; today they are recorded only.
+4. **Refund review queue.** A staff page to approve or deny pending refunds, with an audit trail, instead of the Django admin.
 
 ### Later
 
