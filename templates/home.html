@@ -1,173 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VoltHub — Electronics & Support</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <style>
-    body {
-      background: #f0f4f8;
-      font-family: 'Segoe UI', sans-serif;
-      color: #1a1a2e;
-    }
+{% extends 'base.html' %}
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 0;
-    }
+{% block title %}VoltHub — TVs, phones and laptops across Europe{% endblock %}
 
-    .brand {
-      font-weight: 700;
-      font-size: 18px;
-      margin: 0;
-    }
+{% block content %}
 
-    .topbar form { display: inline; }
-
-    .link-btn {
-      background: none;
-      border: none;
-      color: #495057;
-      font-size: 14px;
-      padding: 0;
-      margin-left: 16px;
-      text-decoration: none;
-    }
-
-    .link-btn:hover { color: #1a1a2e; }
-
-    .hero {
-      background: #fff;
-      border-radius: 16px;
-      padding: 56px 40px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      margin-top: 24px;
-    }
-
-    .hero h1 {
-      font-weight: 700;
-      font-size: 36px;
-      margin-bottom: 12px;
-    }
-
-    .hero p {
-      color: #6c757d;
-      font-size: 16px;
-      max-width: 560px;
-      margin: 0 auto 28px;
-    }
-
-    .btn-main {
-      background: #1a1a2e;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 28px;
-      font-size: 15px;
-      font-weight: 500;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-main:hover {
-      background: #2d2d4e;
-      color: #fff;
-    }
-
-    .feature {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      height: 100%;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .feature h6 {
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .feature p {
-      color: #6c757d;
-      font-size: 14px;
-      margin: 0;
-    }
-
-    .feature .icon {
-      font-size: 24px;
-      margin-bottom: 12px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #6c757d;
-      padding: 32px 0;
-    }
-
-    footer strong { color: #495057; }
-  </style>
-</head>
-<body>
-
-{% include 'partials/navbar.html' %}
-
-<div class="container" style="max-width: 960px;">
-
-  <div class="hero">
-    <h1>TVs, phones and laptops, with help any time</h1>
-    <p>
-      Shop the latest electronics, track your deliveries and get instant
-      help from Aura, our AI support assistant. Refunds and complex issues
-      are reviewed by our support manager.
-    </p>
-    <a href="{% url 'product_list' %}" class="btn-main">Browse the shop</a>
-    {% if user.is_authenticated %}
-      <p class="mt-3 mb-0 small">
-        <a href="{% url 'orders_list' %}" class="text-dark fw-semibold">Go to my orders</a>
-      </p>
-    {% else %}
-      <p class="mt-3 mb-0 small">
-        New here? <a href="{% url 'signup' %}" class="text-dark fw-semibold">Create an account</a>
-        &nbsp;·&nbsp; Already a customer? <a href="{% url 'login' %}" class="text-dark fw-semibold">Sign in</a>
-      </p>
-    {% endif %}
+{% if hero %}
+<section class="vh-hero">
+  <p class="vh-eyebrow">New</p>
+  <h1>{{ hero.name|cut:"VoltHub " }}</h1>
+  <p class="vh-sub">{{ hero.description|tagline }}</p>
+  <div class="vh-actions">
+    <form method="POST" action="{% url 'cart_add' hero.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'cart_detail' %}"/>
+      <button type="submit" class="vh-btn">Buy · {{ hero.price|money }}</button>
+    </form>
+    <a href="{% url 'product_list' %}?category={{ hero.category|urlencode }}" class="vh-link-arrow">See all {{ hero.category }}</a>
   </div>
+  <div style="margin-top:48px;">
+    {% include 'partials/product_visual.html' with category=hero.category size='hero' %}
+  </div>
+</section>
+{% endif %}
 
-  <div class="row g-3 mt-3">
-    <div class="col-md-4">
-      <div class="feature">
+<section class="vh-tiles">
+  {% for product in tiles %}
+    <div class="vh-tile{% if forloop.counter == 2 or forloop.counter == 3 %} dark{% endif %}">
+      <h2>{{ product.name|cut:"VoltHub " }}</h2>
+      <p class="vh-sub">{{ product.description|tagline }}</p>
+      <div class="vh-actions" style="gap:24px;">
+        <form method="POST" action="{% url 'cart_add' product.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'cart_detail' %}"/>
+          <button type="submit" class="vh-btn vh-btn-small">Buy</button>
+        </form>
+        <a href="{% url 'product_list' %}?category={{ product.category|urlencode }}" class="vh-link-arrow">{{ product.category }}</a>
+      </div>
+      {% include 'partials/product_visual.html' with category=product.category %}
+    </div>
+  {% endfor %}
+</section>
+
+<section class="vh-section alt">
+  <div class="vh-container">
+    <h2 class="vh-section-title">Why shop with VoltHub.</h2>
+    <div class="vh-features">
+      <div class="vh-feature">
         <div class="icon">💬</div>
-        <h6>Chat with Aura</h6>
-        <p>Ask about any of your orders and get an answer straight away.</p>
+        <h3>Help in seconds.</h3>
+        <p>Aura, our AI support assistant, answers questions about your orders any time, day or night.</p>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="feature">
+      <div class="vh-feature">
         <div class="icon">🚚</div>
-        <h6>Track deliveries</h6>
-        <p>See where your TV, phone or laptop is and when it should arrive.</p>
+        <h3>Delivery across Europe.</h3>
+        <p>Tracked shipping with DHL, DPD and bpost, with live delivery status for every order.</p>
+      </div>
+      <div class="vh-feature">
+        <div class="icon">↩️</div>
+        <h3>Fair returns.</h3>
+        <p>14 days to change your mind and a 2-year guarantee on faulty products, decided quickly.</p>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="feature">
-        <div class="icon">↩️</div>
-        <h6>Refunds and issues</h6>
-        <p>Report a damaged product or request a refund and get a clear decision.</p>
-      </div>
+    <div class="vh-actions" style="margin-top:40px;">
+      {% if user.is_authenticated %}
+        <a href="{% url 'orders_list' %}" class="vh-link-arrow">View your orders</a>
+      {% else %}
+        <a href="{% url 'signup' %}" class="vh-btn">Create your account</a>
+        <a href="{% url 'login' %}" class="vh-link-arrow">Sign in</a>
+      {% endif %}
     </div>
   </div>
+</section>
 
-  <footer>
-    copyright: <strong>atinos31.dev</strong> &nbsp;·&nbsp;
-    2026: <strong>all rights reserved</strong>
-  </footer>
-
-</div>
-
-</body>
-</html>
+{% endblock %}

@@ -1,180 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shop — VoltHub</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <style>
-    body {
-      background: #f0f4f8;
-      font-family: 'Segoe UI', sans-serif;
-      color: #1a1a2e;
-    }
+{% extends 'base.html' %}
 
-    .page-header {
-      padding: 32px 0 8px;
-    }
+{% block title %}{% if selected_category %}{{ selected_category }}{% else %}Shop{% endif %} — VoltHub{% endblock %}
 
-    .page-header h5 {
-      font-weight: 700;
-      margin: 0;
-    }
+{% block content %}
+<div class="vh-container">
 
-    .page-header p {
-      color: #6c757d;
-      font-size: 13px;
-      margin: 4px 0 0;
-    }
+  <h1 class="vh-page-title">
+    {% if selected_category %}{{ selected_category }}.{% else %}Shop.{% endif %}
+    <span class="vh-muted">Everything you need, delivered across Europe.</span>
+  </h1>
 
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 16px 0 24px;
-    }
-
-    .filter-pill {
-      font-size: 13px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid #dee2e6;
-      background: #fff;
-      color: #495057;
-      text-decoration: none;
-    }
-
-    .filter-pill.active,
-    .filter-pill:hover {
-      background: #1a1a2e;
-      border-color: #1a1a2e;
-      color: #fff;
-    }
-
-    .product-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .product-icon {
-      background: #f0f4f8;
-      border-radius: 10px;
-      font-size: 44px;
-      text-align: center;
-      padding: 22px 0;
-      margin-bottom: 16px;
-    }
-
-    .product-category {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #6c5ce7;
-      font-weight: 600;
-    }
-
-    .product-name {
-      font-weight: 600;
-      font-size: 15px;
-      margin: 4px 0 8px;
-    }
-
-    .product-desc {
-      color: #6c757d;
-      font-size: 13px;
-      flex-grow: 1;
-    }
-
-    .product-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 12px;
-    }
-
-    .product-price {
-      font-weight: 700;
-      font-size: 17px;
-    }
-
-    .btn-add {
-      background: #1a1a2e;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .btn-add:hover { background: #2d2d4e; }
-
-    .btn-add:disabled {
-      background: #adb5bd;
-      cursor: not-allowed;
-    }
-  </style>
-</head>
-<body>
-
-{% include 'partials/navbar.html' %}
-
-<div class="container pb-5">
-
-  {% include 'partials/messages.html' %}
-
-  <div class="page-header">
-    <h5>Shop</h5>
-    <p>TVs, phones, laptops and more, delivered to your door.</p>
-  </div>
-
-  <div class="filters">
-    <a href="{% url 'product_list' %}" class="filter-pill{% if not selected_category %} active{% endif %}">All</a>
+  <div class="vh-filters">
+    <a href="{% url 'product_list' %}" class="vh-filter{% if not selected_category %} active{% endif %}">All</a>
     {% for category in categories %}
       <a href="?category={{ category|urlencode }}"
-         class="filter-pill{% if category == selected_category %} active{% endif %}">{{ category }}</a>
+         class="vh-filter{% if category == selected_category %} active{% endif %}">{{ category }}</a>
     {% endfor %}
   </div>
 
-  <div class="row g-3">
+  <div class="vh-products">
     {% for product in products %}
-      <div class="col-sm-6 col-lg-4">
-        <div class="product-card">
-          <div class="product-icon">
-            {% if product.category == "TVs" %}📺
-            {% elif product.category == "Phones" %}📱
-            {% elif product.category == "Laptops" %}💻
-            {% elif product.category == "Tablets" %}📲
-            {% else %}🎧{% endif %}
-          </div>
-          <span class="product-category">{{ product.category }}</span>
-          <p class="product-name">{{ product.name }}</p>
-          <p class="product-desc">{{ product.description }}</p>
-          <div class="product-footer">
-            <span class="product-price">₹{{ product.price }}</span>
-            <form method="POST" action="{% url 'cart_add' product.id %}">
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
-              {% if product.in_stock %}
-                <button type="submit" class="btn-add">Add to cart</button>
-              {% else %}
-                <button type="button" class="btn-add" disabled>Out of stock</button>
-              {% endif %}
-            </form>
-          </div>
+      <div class="vh-product">
+        {% include 'partials/product_visual.html' with category=product.category size='small' %}
+        <span class="vh-new">{{ product.category }}</span>
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.description }}</p>
+        <div class="vh-product-footer">
+          <span class="vh-price">{{ product.price|money }}</span>
+          <form method="POST" action="{% url 'cart_add' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
+            {% if product.in_stock %}
+              <button type="submit" class="vh-btn vh-btn-small">Add to Bag</button>
+            {% else %}
+              <button type="button" class="vh-btn vh-btn-small" disabled>Sold out</button>
+            {% endif %}
+          </form>
         </div>
       </div>
     {% empty %}
-      <p class="text-muted">No products found.</p>
+      <p class="vh-muted">No products found.</p>
     {% endfor %}
   </div>
 
 </div>
-
-</body>
-</html>
+{% endblock %}

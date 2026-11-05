@@ -1,0 +1,16 @@
+{# Drawn product illustration by category. #}
+{# Usage: {% include 'partials/product_visual.html' with category=product.category size='small' %} #}
+{# size: 'hero', 'small', 'tiny' or empty for the default tile size. #}
+<div class="vh-visual{% if size %} vh-visual-{{ size }}{% endif %} cat-{{ category|slugify }}" aria-hidden="true">
+  {% if category == "TVs" %}
+    <div class="vh-device vh-tv"><div class="screen"></div><div class="neck"></div><div class="foot"></div></div>
+  {% elif category == "Phones" %}
+    <div class="vh-device vh-phone"><div class="screen"></div></div>
+  {% elif category == "Laptops" %}
+    <div class="vh-device vh-laptop"><div class="screen"></div><div class="base"></div></div>
+  {% elif category == "Tablets" %}
+    <div class="vh-device vh-tablet"><div class="screen"></div></div>
+  {% else %}
+    <div class="vh-device vh-buds"></div>
+  {% endif %}
+</div>

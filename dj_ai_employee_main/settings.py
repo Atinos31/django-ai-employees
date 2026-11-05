@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 
-from decouple import config
+from decouple import Csv, config
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,9 +33,20 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+# Comma-separated host names, e.g. "volthub.example.com,www.volthub.example.com".
+# Empty is fine locally: with DEBUG on, Django allows localhost.
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
 
+# Comma-separated origins with scheme, e.g. "https://volthub.example.com".
+# Needed for POST forms (login, checkout, chat) on a non-localhost domain.
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 
-ALLOWED_HOSTS = []
+# On Railway, trust the service's public domain automatically, plus the
+# hostname Railway's healthchecks use.
+RAILWAY_PUBLIC_DOMAIN = config('RAILWAY_PUBLIC_DOMAIN', default='')
+if RAILWAY_PUBLIC_DOMAIN:
+    ALLOWED_HOSTS += [RAILWAY_PUBLIC_DOMAIN, 'healthcheck.railway.app']
+    CSRF_TRUSTED_ORIGINS += [f'https://{RAILWAY_PUBLIC_DOMAIN}']
 
 
 # Application definition
@@ -56,6 +67,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Serves the collected static files in production (right after SecurityMiddleware)
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,6 +91,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'shop.context_processors.cart_count',
             ],
+            # {{ price|money }} and {{ text|tagline }} work in every template without {% load %}
+            'builtins': ['shop.templatetags.volthub'],
         },
     },
 ]
@@ -127,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Brussels'
 
 USE_I18N = True
 
@@ -138,6 +153,52 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # our own CSS (source files)
+STATIC_ROOT = BASE_DIR / 'staticfiles'    # where collectstatic puts everything
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        # Production: compressed files with content hashes in their names,
+        # so browsers can cache them forever. Needs collectstatic first.
+        # Development: plain storage, so runserver works without collectstatic.
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if DEBUG
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
+
+
+# Security behind Railway's HTTPS proxy
+# Railway terminates HTTPS and forwards plain HTTP with X-Forwarded-Proto.
+# Trusting that header makes request.is_secure() and build_absolute_uri()
+# use https, which the Stripe return links rely on. No SSL redirect here:
+# Railway already serves HTTPS, and its healthchecks call over plain HTTP.
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+
+# Logging: send everything (including tracebacks from logger.exception)
+# to stdout, so it shows up in Railway's deploy logs.
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': config('LOG_LEVEL', default='INFO'),
+    },
+}
 
 
 # Email
@@ -150,7 +211,7 @@ MAILERS = {
 }
 
 LOGIN_REDIRECT_URL = '/orders/'  # Redirect to the orders page after login
-LOGOUT_REDIRECT_URL = '/login/'  # Redirect to the login page after logout
+LOGOUT_REDIRECT_URL = '/'  # Back to the landing page after logout
 LOGIN_URL = '/login/'  # URL for the login page
 
 # claude api key and model
@@ -159,4 +220,21 @@ ANTHROPIC_MODEL = config('ANTHROPIC_MODEL')
 
 # Largest order amount the Manager Agent may approve a refund for on its own.
 # Larger refunds are saved as pending for human staff.
-MANAGER_REFUND_LIMIT = config('MANAGER_REFUND_LIMIT', default=40000, cast=int)
+MANAGER_REFUND_LIMIT = config('MANAGER_REFUND_LIMIT', default=1000, cast=int)
+
+# Stripe checkout (use test mode keys: sk_test_...)
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_CURRENCY = config('STRIPE_CURRENCY', default='eur')
+
+# Shown in front of every price on the site
+CURRENCY_SYMBOL = config('CURRENCY_SYMBOL', default='€')
+
+# ChromaDB knowledge base (company documents for RAG).
+# Locally it lives in ./chroma_db. On Railway, attach a Volume and the
+# database is stored on it automatically (RAILWAY_VOLUME_MOUNT_PATH), so it
+# survives redeploys. CHROMA_PATH overrides both.
+_volume_path = config('RAILWAY_VOLUME_MOUNT_PATH', default='')
+CHROMA_PATH = Path(config(
+    'CHROMA_PATH',
+    default=str(Path(_volume_path) / 'chroma_db') if _volume_path else str(BASE_DIR / 'chroma_db'),
+))

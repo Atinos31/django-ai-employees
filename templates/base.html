@@ -1,0 +1,36 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}VoltHub{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/volthub.css' %}"/>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+{% include 'partials/navbar.html' %}
+
+{% if messages %}
+  <div class="vh-container">{% include 'partials/messages.html' %}</div>
+{% endif %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="vh-footer">
+  <div class="vh-container">
+    <p class="vh-small" style="margin:0 0 12px;">
+      Delivery across Europe. 14-day returns and a 2-year guarantee on every product.
+    </p>
+    <div class="vh-footer-inner">
+      <span>Copyright © 2026 VoltHub · atinos31.dev. All rights reserved.</span>
+      <span>Europe · English · EUR</span>
+    </div>
+  </div>
+</footer>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

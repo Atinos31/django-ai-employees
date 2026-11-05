@@ -15,8 +15,8 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'created_at')
 
 class RefundRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'order', 'user', 'reason', 'status', 'created_at', 'updated_at')
-    search_fields = ('reason', 'user__username')
+    list_display = ('id', 'order', 'user', 'reason', 'status', 'decision_note', 'created_at', 'updated_at')
+    search_fields = ('reason', 'decision_note', 'user__username')
     list_filter = ('status', 'created_at')
 
 # Register your models here.

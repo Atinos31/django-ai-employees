@@ -6,7 +6,11 @@ from support.models import Conversation
 
 @login_required
 def orders_list(request):
-    orders = Order.objects.filter(user=request.user)
+    orders = (
+        Order.objects.filter(user=request.user)
+        .select_related('product')
+        .order_by('-created_at')
+    )
     context = {
         'orders': orders,
     }
@@ -20,12 +24,14 @@ def order_detail(request, order_id):
     # get refund history for this order
     refunds = RefundRequest.objects.filter(order=order)
 
-    try:
-        conversation = Conversation.objects.get(user=request.user, order=order)
-        previous_messages = conversation.messages.order_by("created_at")
-    except Conversation.DoesNotExist:
-        conversation = None
-        previous_messages = []
+    conversation = (
+        Conversation.objects.filter(user=request.user, order=order)
+        .order_by("created_at")
+        .first()
+    )
+    previous_messages = (
+        conversation.messages.order_by("created_at") if conversation else []
+    )
 
     context = {
         'order': order,

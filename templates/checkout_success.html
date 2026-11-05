@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Order confirmed — VoltHub{% endblock %}
+
+{% block content %}
+<div class="vh-container-narrow" style="padding-bottom:80px;">
+
+  <div style="text-align:center;padding:56px 0 32px;">
+    <div style="font-size:56px;">✅</div>
+    <h1 style="font-size:40px;margin:12px 0 8px;">Thank you. Your order is placed.</h1>
+    <p class="vh-muted">Payment received. We'll deliver to:<br/>{{ orders.0.delivery|linebreaksbr }}</p>
+  </div>
+
+  <div class="vh-card">
+    {% for order in orders %}
+      <div class="vh-row">
+        <div class="vh-row-main">
+          {% include 'partials/product_visual.html' with category=order.product.category size='tiny' %}
+          <div>
+            <a href="{% url 'order_detail' order.id %}" class="vh-row-title" style="color:var(--vh-text);">{{ order.product_name }}</a>
+            <p class="vh-row-meta">Order #{{ order.id }} · Qty {{ order.quantity }}</p>
+          </div>
+        </div>
+        <span class="vh-price">{{ order.amount|money }}</span>
+      </div>
+    {% endfor %}
+    <div class="vh-total" style="margin:20px 0 0;">
+      <span>Total paid</span>
+      <span>{{ total|money }}</span>
+    </div>
+  </div>
+
+  <div class="vh-actions" style="margin-top:32px;">
+    <a href="{% url 'orders_list' %}" class="vh-btn">View Your Orders</a>
+    <a href="{% url 'product_list' %}" class="vh-link-arrow">Continue shopping</a>
+  </div>
+  <p class="vh-small vh-muted" style="text-align:center;margin-top:20px;">
+    Questions about an order? Open it and chat with Aura, our support assistant.
+  </p>
+
+</div>
+{% endblock %}

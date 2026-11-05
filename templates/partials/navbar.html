@@ -1,71 +1,29 @@
-<style>
-  .vh-nav {
-    background: #1a1a2e;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .vh-nav .vh-brand {
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    text-decoration: none;
-  }
-
-  .vh-nav .vh-links {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-
-  .vh-nav .vh-links a,
-  .vh-nav .vh-links button,
-  .vh-nav .vh-links span {
-    color: rgba(255,255,255,0.75);
-    font-size: 13px;
-    text-decoration: none;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-  }
-
-  .vh-nav .vh-links a:hover,
-  .vh-nav .vh-links button:hover {
-    color: #fff;
-  }
-
-  .vh-nav .vh-cart-count {
-    background: #6c5ce7;
-    color: #fff !important;
-    border-radius: 10px;
-    padding: 1px 7px !important;
-    font-size: 11px !important;
-    margin-left: 4px;
-  }
-
-  .vh-nav form { display: inline; margin: 0; }
-</style>
-
 <nav class="vh-nav">
-  <a href="{% url 'home' %}" class="vh-brand">⚡ VoltHub</a>
-  <div class="vh-links">
-    <a href="{% url 'product_list' %}">Shop</a>
-    <a href="{% url 'cart_detail' %}">
-      Cart{% if cart_count %}<span class="vh-cart-count">{{ cart_count }}</span>{% endif %}
-    </a>
-    {% if user.is_authenticated %}
-      <a href="{% url 'orders_list' %}">My orders</a>
-      <span>Hi, {{ user.first_name|default:user.username }}</span>
-      <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Log out</button>
-      </form>
-    {% else %}
-      <a href="{% url 'login' %}">Sign in</a>
-      <a href="{% url 'signup' %}">Create account</a>
-    {% endif %}
+  <div class="vh-nav-inner">
+    <a href="{% url 'home' %}" class="vh-brand">⚡ VoltHub</a>
+
+    <div class="vh-nav-links">
+      <a href="{% url 'product_list' %}?category=TVs" class="vh-hide-mobile">TV</a>
+      <a href="{% url 'product_list' %}?category=Phones" class="vh-hide-mobile">Phone</a>
+      <a href="{% url 'product_list' %}?category=Laptops" class="vh-hide-mobile">Laptop</a>
+      <a href="{% url 'product_list' %}?category=Tablets" class="vh-hide-mobile">Tablet</a>
+      <a href="{% url 'product_list' %}?category=Accessories" class="vh-hide-mobile">Accessories</a>
+      <a href="{% url 'product_list' %}">Shop</a>
+    </div>
+
+    <div class="vh-nav-links">
+      {% if user.is_authenticated %}
+        <a href="{% url 'orders_list' %}">Orders</a>
+        <form method="POST" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">Sign out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Sign in</a>
+      {% endif %}
+      <a href="{% url 'cart_detail' %}" aria-label="Bag">
+        Bag{% if cart_count %}<span class="vh-cart-count">{{ cart_count }}</span>{% endif %}
+      </a>
+    </div>
   </div>
 </nav>
